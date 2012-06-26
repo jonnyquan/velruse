@@ -105,7 +105,7 @@ class TaobaoProvider(object):
                 'app_key': self.consumer_key,
                 'v': '2.0',
                 'sign_method': 'md5',
-                'fields': 'user_id,nick',
+                'fields': 'user_id,nick,avatar,sex',
                 'session': access_token
                 }
         src = self.consumer_secret\
@@ -118,14 +118,17 @@ class TaobaoProvider(object):
         if r.status_code != 200:
             raise ThirdPartyFailure("Status %s: %s" % (r.status_code, r.content))
         data = loads(r.content)
-
         username = data['user_get_response']['user']['nick']
         userid = data['user_get_response']['user']['user_id']
-
+        profile_image_url=data['user_get_response']['user']['avatar']
+        sex =data['user_get_response']['user']['sex']
         profile = {
             'accounts': [{'domain':'taobao.com', 'userid':userid}],
             'displayName': username,
+            'gender':sex,
             'preferredUsername': username,
+            'profile_image_url':profile_image_url,
+            'access_token':access_token
         }
 
         cred = {'oauthAccessToken': access_token}

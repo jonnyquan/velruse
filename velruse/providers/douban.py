@@ -130,5 +130,7 @@ class DoubanProvider(object):
             'accounts': [{'domain':'douban.com', 'userid':douban_user_id}],
             'displayName': user_data['title']['$t'],
             'preferredUsername': user_data['title']['$t'],
+            'access_token':access_token
+
         }
         return DoubanAuthenticationComplete(profile=profile, credentials=cred)

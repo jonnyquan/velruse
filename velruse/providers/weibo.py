@@ -1,4 +1,5 @@
 """Sina Microblogging weibo.com Authentication Views"""
+import urlparse
 import uuid
 from json import loads
 
@@ -71,7 +72,9 @@ class WeiboProvider(object):
 
     def login(self, request):
         """Initiate a weibo login"""
-        request.session['state'] = state = uuid.uuid4().hex
+        query_string=request.query_string
+        request.session['state_code'] =state_code = uuid.uuid4().hex
+        state="%s&state_code=%s"%(query_string,state_code)
         fb_url = flat_url('https://api.weibo.com/oauth2/authorize',
                           client_id=self.consumer_key,
                           redirect_uri=request.route_url(self.callback_route),
@@ -80,11 +83,16 @@ class WeiboProvider(object):
 
     def callback(self, request):
         """Process the weibo redirect"""
-        if request.GET.get('state') != request.session.get('state'):
-            raise CSRFError("CSRF Validation check failed. Request state %s is "
-                            "not the same as session state %s" % (
-                            request.GET.get('state'), request.session.get('state')
-                            ))
+        state=request.GET.get('state')
+        statedata=urlparse.parse_qs(state)
+        print 'statedata:%s'%statedata
+        if 'state_code' in statedata:
+            state_code=statedata["state_code"][0]
+            if state_code != request.session.get('state_code'):
+                raise CSRFError("CSRF Validation check failed. Request state %s is "
+                                "not the same as session state %s" % (
+                    state_code, request.session.get('state_code')
+                                ))
         code = request.GET.get('code')
         if not code:
             reason = request.GET.get('error_reason', 'No reason provided.')
@@ -123,7 +131,11 @@ class WeiboProvider(object):
             'gender': data.get('gender'),
             'displayName': data['screen_name'],
             'preferredUsername': data['name'],
+            'profile_image_url':data['profile_image_url'],
+            'access_token':access_token
         }
+        if 'next' in statedata:
+            profile['next']=statedata['next'][0]
 
         cred = {'oauthAccessToken': access_token}
         return WeiboAuthenticationComplete(profile=profile, credentials=cred)
