@@ -121,7 +121,9 @@ class TaobaoProvider(object):
         username = data['user_get_response']['user']['nick']
         userid = data['user_get_response']['user']['user_id']
         profile_image_url=data['user_get_response']['user']['avatar']
-        sex =data['user_get_response']['user']['sex']
+        sex='m'
+        if 'sex' in data['user_get_response']['user']:
+            sex =data['user_get_response']['user']['sex']
         profile = {
             'accounts': [{'domain':'taobao.com', 'userid':userid}],
             'displayName': username,
