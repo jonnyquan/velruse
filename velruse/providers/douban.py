@@ -34,7 +34,7 @@ def includeme(config):
                          add_douban_login_from_settings)
 
 
-def add_douban_login_from_settings(config, prefix='velruse.douban'):
+def add_douban_login_from_settings(config, prefix='velruse.douban.'):
     settings = config.registry.settings
     p = ProviderSettings(settings, prefix)
     p.update('consumer_key', required=True)
@@ -125,12 +125,17 @@ class DoubanProvider(object):
         resp, content = client.request(USER_URL)
 
         user_data = json.loads(content)
+        print 'user_data:%s'%user_data
         # Setup the normalized contact info
         profile = {
             'accounts': [{'domain':'douban.com', 'userid':douban_user_id}],
             'displayName': user_data['title']['$t'],
             'preferredUsername': user_data['title']['$t'],
-            'access_token':access_token
-
+            'access_token':access_token,
         }
+        links=user_data['link']
+        for link in links:
+            if link['@rel']=='icon':
+                profile['profile_image_url']=link['@href']
+
         return DoubanAuthenticationComplete(profile=profile, credentials=cred)
