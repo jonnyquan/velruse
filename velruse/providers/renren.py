@@ -31,7 +31,7 @@ def add_renren_login_from_settings(config, prefix='velruse.renren.'):
     p = ProviderSettings(settings, prefix)
     p.update('consumer_key', required=True)
     p.update('consumer_secret', required=True)
-    p.update('scope')
+    #p.update('scope')
     p.update('login_path')
     p.update('callback_path')
     config.add_renren_login(**p.kwargs)
