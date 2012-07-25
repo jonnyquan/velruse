@@ -107,6 +107,7 @@ class RenrenProvider(object):
             ],
             'displayName': data['user']['name'],
             'preferredUsername': data['user']['name'],
+            'access_token':access_token
         }
         if 'avatar' in data['user'] and len(data['user']['avatar'])>0:
             profile['profile_image_url']=data['user']['avatar'][0]['url']
