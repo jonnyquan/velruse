@@ -125,7 +125,6 @@ class DoubanProvider(object):
         resp, content = client.request(USER_URL)
 
         user_data = json.loads(content)
-        print 'user_data:%s'%user_data
         # Setup the normalized contact info
         profile = {
             'accounts': [{'domain':'douban.com', 'userid':douban_user_id}],
