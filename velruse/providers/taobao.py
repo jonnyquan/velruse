@@ -71,6 +71,9 @@ class TaobaoProvider(object):
 
     def login(self, request):
         """Initiate a taobao login"""
+        referer=request.referer
+        request.session['opennexturl']=referer
+
         gh_url = flat_url('https://oauth.taobao.com/authorize',
                           client_id=self.consumer_key,
                           response_type='code',

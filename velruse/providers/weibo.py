@@ -73,6 +73,9 @@ class WeiboProvider(object):
     def login(self, request):
         """Initiate a weibo login"""
         query_string=request.query_string
+        referer=request.referer
+        request.session['opennexturl']=referer
+
         request.session['state_code'] =state_code = uuid.uuid4().hex
         state="%s&state_code=%s"%(query_string,state_code)
         fb_url = flat_url('https://api.weibo.com/oauth2/authorize',
@@ -85,7 +88,7 @@ class WeiboProvider(object):
         """Process the weibo redirect"""
         state=request.GET.get('state')
         statedata=urlparse.parse_qs(state)
-        print 'statedata:%s'%statedata
+        #print 'statedata:%s'%statedata
         if 'state_code' in statedata:
             state_code=statedata["state_code"][0]
             if state_code != request.session.get('state_code'):

@@ -75,6 +75,8 @@ class QQProvider(object):
 
     def login(self, request):
         """Initiate a qq login"""
+        referer=request.referer
+        request.session['opennexturl']=referer
         query_string = request.query_string
         request.session['state_code'] = state_code = uuid.uuid4().hex
         state = "%s&state_code=%s" % (query_string, state_code)

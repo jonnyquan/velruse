@@ -77,6 +77,8 @@ class DoubanProvider(object):
 
     def login(self, request):
         """Initiate a douban login"""
+        referer=request.referer
+        request.session['opennexturl']=referer
         consumer = oauth.Consumer(self.consumer_key, self.consumer_secret)
 
         oauth_request = oauth.Request.from_consumer_and_token(consumer,

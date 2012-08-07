@@ -72,6 +72,9 @@ class RenrenProvider(object):
 
     def login(self, request):
         """Initiate a renren login"""
+        referer=request.referer
+        request.session['opennexturl']=referer
+
         scope = request.POST.get('scope', self.scope)
         url = flat_url('https://graph.renren.com/oauth/authorize',
                        scope=scope,
