@@ -92,14 +92,16 @@ class QQProvider(object):
     def callback(self, request):
         """Process the qq redirect"""
         state = request.GET.get('state')
-        statedata = urlparse.parse_qs(state)
-        if 'state_code' in statedata:
-            state_code = statedata["state_code"][0]
-            if state_code != request.session.get('state_code'):
-                raise CSRFError("CSRF Validation check failed. Request state %s is "
-                                "not the same as session state %s" % (
-                    state_code, request.session.get('state_code')
-                    ))
+        statedata=None
+        if state:
+            statedata = urlparse.parse_qs(state)
+            if 'state_code' in statedata:
+                state_code = statedata["state_code"][0]
+                if state_code != request.session.get('state_code'):
+                    raise CSRFError("CSRF Validation check failed. Request state %s is "
+                                    "not the same as session state %s" % (
+                        state_code, request.session.get('state_code')
+                        ))
         code = request.GET.get('code')
         if not code:
             reason = request.GET.get('error', 'No reason provided.')
@@ -148,7 +150,7 @@ class QQProvider(object):
             'access_token':access_token,
             'openid':openid
         }
-        if 'next' in statedata:
+        if statedata is not None and 'next' in statedata:
             profile['next'] = statedata['next'][0]
         cred = {'oauthAccessToken': access_token}
         return QQAuthenticationComplete(profile=profile, credentials=cred)

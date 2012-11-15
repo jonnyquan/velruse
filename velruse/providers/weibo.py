@@ -87,15 +87,17 @@ class WeiboProvider(object):
     def callback(self, request):
         """Process the weibo redirect"""
         state=request.GET.get('state')
-        statedata=urlparse.parse_qs(state)
-        #print 'statedata:%s'%statedata
-        if 'state_code' in statedata:
-            state_code=statedata["state_code"][0]
-            if state_code != request.session.get('state_code'):
-                raise CSRFError("CSRF Validation check failed. Request state %s is "
-                                "not the same as session state %s" % (
-                    state_code, request.session.get('state_code')
-                                ))
+        statedata=None
+        if state:
+            statedata=urlparse.parse_qs(state)
+            #print 'statedata:%s'%statedata
+            if 'state_code' in statedata:
+                state_code=statedata["state_code"][0]
+                if state_code != request.session.get('state_code'):
+                    raise CSRFError("CSRF Validation check failed. Request state %s is "
+                                    "not the same as session state %s" % (
+                        state_code, request.session.get('state_code')
+                                    ))
         code = request.GET.get('code')
         if not code:
             reason = request.GET.get('error_reason', 'No reason provided.')
@@ -137,7 +139,7 @@ class WeiboProvider(object):
             'profile_image_url':data['profile_image_url'],
             'access_token':access_token
         }
-        if 'next' in statedata:
+        if statedata is not None and 'next' in statedata:
             profile['next']=statedata['next'][0]
 
         cred = {'oauthAccessToken': access_token}
